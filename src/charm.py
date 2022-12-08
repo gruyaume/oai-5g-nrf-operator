@@ -93,6 +93,7 @@ class Oai5GNrfOperatorCharm(CharmBase):
             nrf_fqdn=f"{self.model.app.name}.svc.cluster.local",
             nrf_port=self._config_sbi_interface_port,
             nrf_api_version=self._config_sbi_interface_nrf_api_version,
+            relation_id=event.relation.id,
         )
 
     def _push_config(self) -> None:

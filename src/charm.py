@@ -7,7 +7,7 @@
 
 import logging
 
-from charms.observability_libs.v1.kubernetes_service_patch import (
+from charms.observability_libs.v1.kubernetes_service_patch import (  # type: ignore[import]
     KubernetesServicePatch,
     ServicePort,
 )

@@ -1,0 +1,7 @@
+options:
+  nrfInterfaceNameForSBI:
+    type: string
+    description: |
+      The interface name for SBI connection to NRF
+    default: eth0
+    required: true

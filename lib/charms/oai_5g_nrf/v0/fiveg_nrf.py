@@ -130,6 +130,57 @@ class FiveGNRFRequires(Object):
             return None
         return remote_app_relation_data.get("nrf_ipv4_address", None)
 
+    @property
+    def nrf_fqdn_available(self) -> bool:
+        """Returns whether nrf fqdn is available in relation data."""
+        if self.nrf_fqdn:
+            return True
+        else:
+            return False
+
+    @property
+    def nrf_fqdn(self) -> Optional[str]:
+        """Returns nrf_fqdn from relation data."""
+        relation = self.model.get_relation(relation_name=self.relationship_name)
+        remote_app_relation_data = relation.data.get(relation.app)
+        if not remote_app_relation_data:
+            return None
+        return remote_app_relation_data.get("nrf_fqdn", None)
+
+    @property
+    def nrf_port_available(self) -> bool:
+        """Returns whether nrf port is available in relation data."""
+        if self.nrf_port:
+            return True
+        else:
+            return False
+
+    @property
+    def nrf_port(self) -> Optional[str]:
+        """Returns nrf_port from relation data."""
+        relation = self.model.get_relation(relation_name=self.relationship_name)
+        remote_app_relation_data = relation.data.get(relation.app)
+        if not remote_app_relation_data:
+            return None
+        return remote_app_relation_data.get("nrf_port", None)
+
+    @property
+    def nrf_api_version_available(self) -> bool:
+        """Returns whether nrf api version is available in relation data."""
+        if self.nrf_api_version:
+            return True
+        else:
+            return False
+
+    @property
+    def nrf_api_version(self) -> Optional[str]:
+        """Returns nrf_api_version from relation data."""
+        relation = self.model.get_relation(relation_name=self.relationship_name)
+        remote_app_relation_data = relation.data.get(relation.app)
+        if not remote_app_relation_data:
+            return None
+        return remote_app_relation_data.get("nrf_api_version", None)
+
 
 class FiveGNRFProvides(Object):
     """Class to be instantiated by the NRF charm providing the 5G NRF Interface."""

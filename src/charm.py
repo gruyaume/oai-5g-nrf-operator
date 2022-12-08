@@ -13,7 +13,7 @@ from charms.observability_libs.v1.kubernetes_service_patch import (  # type: ign
     ServicePort,
 )
 from jinja2 import Environment, FileSystemLoader
-from ops.charm import CharmBase, ConfigChangedEvent, PebbleReadyEvent
+from ops.charm import CharmBase, ConfigChangedEvent
 from ops.main import main
 from ops.model import ActiveStatus, WaitingStatus
 
@@ -49,28 +49,19 @@ class Oai5GNrfOperatorCharm(CharmBase):
             ],
         )
         self.nrf_provides = FiveGNRFProvides(self, "fiveg-nrf")
-        self.framework.observe(self.on.nrf_pebble_ready, self._on_nrf_pebble_ready)
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(
             self.on.fiveg_nrf_relation_joined, self._on_fiveg_nrf_relation_joined
         )
 
-    def _on_nrf_pebble_ready(self, event: PebbleReadyEvent) -> None:
-        """Triggered on Pebble Ready Event.
-
-        Args:
-            event: Pebble Ready Event
+    def _update_pebble_layer(self) -> None:
+        """Update Pebble layer configuration.
 
         Returns:
             None
         """
-        if not self._config_file_is_pushed:
-            self.unit.status = WaitingStatus("Waiting for config files to be pushed")
-            event.defer()
-            return
         self._container.add_layer("nrf", self._pebble_layer, combine=True)
         self._container.replan()
-        self.unit.status = ActiveStatus()
 
     def _on_config_changed(self, event: ConfigChangedEvent) -> None:
         """Triggered on any change in configuration.
@@ -86,7 +77,7 @@ class Oai5GNrfOperatorCharm(CharmBase):
             event.defer()
             return
         self._push_config()
-        self._container.replan()
+        self._update_pebble_layer()
         self.unit.status = ActiveStatus()
 
     def _on_fiveg_nrf_relation_joined(self, event) -> None:

@@ -24,3 +24,7 @@ resources:
     type: oci-image
     description: OCI image for nrf
     upstream-source: docker.io/oaisoftwarealliance/oai-nrf:v1.4.0
+
+provides:
+  fiveg-nrf:
+    interface: fiveg-nrf

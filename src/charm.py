@@ -7,6 +7,7 @@
 
 import logging
 
+from charms.oai_5g_nrf.v0.fiveg_nrf import FiveGNRFProvides  # type: ignore[import]
 from charms.observability_libs.v1.kubernetes_service_patch import (  # type: ignore[import]
     KubernetesServicePatch,
     ServicePort,
@@ -47,8 +48,12 @@ class Oai5GNrfOperatorCharm(CharmBase):
                 ),
             ],
         )
+        self.nrf_provides = FiveGNRFProvides(self, "fiveg-nrf")
         self.framework.observe(self.on.nrf_pebble_ready, self._on_nrf_pebble_ready)
         self.framework.observe(self.on.config_changed, self._on_config_changed)
+        self.framework.observe(
+            self.on.fiveg_nrf_relation_joined, self._on_fiveg_nrf_relation_joined
+        )
 
     def _on_nrf_pebble_ready(self, event: PebbleReadyEvent) -> None:
         """Triggered on Pebble Ready Event.
@@ -83,6 +88,21 @@ class Oai5GNrfOperatorCharm(CharmBase):
         self._push_config()
         self._container.replan()
         self.unit.status = ActiveStatus()
+
+    def _on_fiveg_nrf_relation_joined(self, event) -> None:
+        """Triggered when a relation is joined.
+
+        Args:
+            event: Relation Joined Event
+        """
+        if not self.unit.is_leader():
+            return
+        self.nrf_provides.set_nrf_information(
+            nrf_ipv4_address="127.0.0.1",
+            nrf_fqdn=f"{self.model.app.name}.svc.cluster.local",
+            nrf_port=self._config_sbi_interface_port,
+            nrf_api_version=self._config_sbi_interface_nrf_api_version,
+        )
 
     def _push_config(self) -> None:
         jinja2_environment = Environment(loader=FileSystemLoader("src/templates/"))

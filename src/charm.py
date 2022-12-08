@@ -164,14 +164,6 @@ class Oai5GNrfOperatorCharm(CharmBase):
                     "summary": "nrf",
                     "command": f"/openair-nrf/bin/oai_nrf -c {BASE_CONFIG_PATH}/{CONFIG_FILE_NAME} -o",  # noqa: E501
                     "startup": "enabled",
-                    "environment": {
-                        "INSTANCE": self._config_instance,
-                        "PID_DIRECTORY": self._config_pid_directory,
-                        "NRF_INTERFACE_NAME_FOR_SBI": self._config_sbi_interface_name,
-                        "NRF_INTERFACE_PORT_FOR_SBI": self._config_sbi_interface_port,
-                        "NRF_INTERFACE_HTTP2_PORT_FOR_SBI": self._config_sbi_interface_http2_port,
-                        "NRF_API_VERSION": self._config_sbi_interface_nrf_api_version,
-                    },
                 }
             },
         }

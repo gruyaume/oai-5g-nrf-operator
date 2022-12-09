@@ -90,7 +90,7 @@ class Oai5GNrfOperatorCharm(CharmBase):
             return
         self.nrf_provides.set_nrf_information(
             nrf_ipv4_address="127.0.0.1",
-            nrf_fqdn=f"{self.model.app.name}.svc.cluster.local",
+            nrf_fqdn=f"{self.model.app.name}.{self.model.name}.svc.cluster.local",
             nrf_port=self._config_sbi_interface_port,
             nrf_api_version=self._config_sbi_interface_nrf_api_version,
             relation_id=event.relation.id,

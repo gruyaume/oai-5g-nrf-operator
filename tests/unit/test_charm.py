@@ -18,9 +18,11 @@ class TestCharm(unittest.TestCase):
     )
     def setUp(self):
         ops.testing.SIMULATE_CAN_CONNECT = True
+        self.model_name = "whatever"
         self.addCleanup(setattr, ops.testing, "SIMULATE_CAN_CONNECT", False)
         self.harness = Harness(Oai5GNrfOperatorCharm)
         self.addCleanup(self.harness.cleanup)
+        self.harness.set_model_name(name=self.model_name)
         self.harness.begin()
 
     @patch("ops.model.Container.push")
@@ -101,6 +103,6 @@ class TestCharm(unittest.TestCase):
         )
 
         assert relation_data["nrf_ipv4_address"] == "127.0.0.1"
-        assert relation_data["nrf_fqdn"] == "oai-5g-nrf.svc.cluster.local"
+        assert relation_data["nrf_fqdn"] == f"oai-5g-nrf.{self.model_name}.svc.cluster.local"
         assert relation_data["nrf_port"] == "80"
         assert relation_data["nrf_api_version"] == "v1"

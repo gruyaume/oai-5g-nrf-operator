@@ -91,6 +91,9 @@ class Oai5GNrfOperatorCharm(CharmBase):
         if not self._nrf_service_started:
             event.defer()
             return
+        if not self._nrf_is_listening:
+            event.defer()
+            return
         self.nrf_provides.set_nrf_information(
             nrf_ipv4_address="127.0.0.1",
             nrf_fqdn=f"{self.model.app.name}.{self.model.name}.svc.cluster.local",
@@ -105,6 +108,17 @@ class Oai5GNrfOperatorCharm(CharmBase):
             return False
         if not self._container.get_service(self._service_name).is_running():
             return False
+        return True
+
+    @property
+    def _nrf_is_listening(self) -> bool:
+        # TODO: Check if the NRF is listening on the configured port
+        # NRF_IP_SBI_INTERFACE=$(ifconfig $NRF_INTERFACE_NAME_FOR_SBI | grep inet | awk {'print $2'})  # noqa: E501, W505
+        # NRF_SBI_PORT_STATUS=$(netstat -tnpl | grep -o "$NRF_IP_SBI_INTERFACE:$NRF_INTERFACE_PORT_FOR_SBI") # noqa: E501, W505
+        # if [[ -z $NRF_SBI_PORT_STATUS ]]; then
+        # 	STATUS=1
+        # 	echo "Healthcheck error: UNHEALTHY SBI TCP/HTTP port $NRF_INTERFACE_PORT_FOR_SBI is not listening." # noqa: E501, W505
+        # fi
         return True
 
     def _push_config(self) -> None:

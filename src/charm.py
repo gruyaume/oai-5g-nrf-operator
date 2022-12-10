@@ -29,7 +29,7 @@ class Oai5GNrfOperatorCharm(CharmBase):
     def __init__(self, *args):
         """Observes juju events."""
         super().__init__(*args)
-        self._container_name = "nrf"
+        self._container_name = self._service_name = "nrf"
         self._container = self.unit.get_container(self._container_name)
         self.service_patcher = KubernetesServicePatch(
             charm=self,
@@ -88,6 +88,9 @@ class Oai5GNrfOperatorCharm(CharmBase):
         """
         if not self.unit.is_leader():
             return
+        if not self._nrf_service_started:
+            event.defer()
+            return
         self.nrf_provides.set_nrf_information(
             nrf_ipv4_address="127.0.0.1",
             nrf_fqdn=f"{self.model.app.name}.{self.model.name}.svc.cluster.local",
@@ -95,6 +98,14 @@ class Oai5GNrfOperatorCharm(CharmBase):
             nrf_api_version=self._config_sbi_interface_nrf_api_version,
             relation_id=event.relation.id,
         )
+
+    @property
+    def _nrf_service_started(self) -> bool:
+        if not self._container.can_connect():
+            return False
+        if not self._container.get_service(self._service_name).is_running():
+            return False
+        return True
 
     def _push_config(self) -> None:
         jinja2_environment = Environment(loader=FileSystemLoader("src/templates/"))
@@ -151,7 +162,7 @@ class Oai5GNrfOperatorCharm(CharmBase):
             "summary": "nrf layer",
             "description": "pebble config layer for nrf",
             "services": {
-                "nrf": {
+                self._service_name: {
                     "override": "replace",
                     "summary": "nrf",
                     "command": f"/openair-nrf/bin/oai_nrf -c {BASE_CONFIG_PATH}/{CONFIG_FILE_NAME} -o",  # noqa: E501

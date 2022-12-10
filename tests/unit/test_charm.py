@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 import ops.testing
 from ops.model import ActiveStatus
+from ops.pebble import ServiceInfo, ServiceStartup, ServiceStatus
 from ops.testing import Harness
 
 from charm import Oai5GNrfOperatorCharm
@@ -92,8 +93,17 @@ class TestCharm(unittest.TestCase):
             "};\n",
         )
 
-    def test_given_unit_is_leader_when_nrf_relation_joined_then_nrf_relation_data_is_set(self):
+    @patch("ops.model.Container.get_service")
+    def test_given_nrf_service_started_when_nrf_relation_joined_then_nrf_relation_data_is_set(
+        self, patch_get_service
+    ):
         self.harness.set_leader(True)
+        self.harness.set_can_connect(container="nrf", val=True)
+        patch_get_service.return_value = ServiceInfo(
+            name="nrf",
+            current=ServiceStatus.ACTIVE,
+            startup=ServiceStartup.ENABLED,
+        )
 
         relation_id = self.harness.add_relation(relation_name="fiveg-nrf", remote_app="udr")
         self.harness.add_relation_unit(relation_id=relation_id, remote_unit_name="udr/0")

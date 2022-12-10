@@ -6,6 +6,7 @@
 
 
 import logging
+import time
 
 from charms.oai_5g_nrf.v0.fiveg_nrf import FiveGNRFProvides  # type: ignore[import]
 from charms.observability_libs.v1.kubernetes_service_patch import (  # type: ignore[import]
@@ -112,13 +113,14 @@ class Oai5GNrfOperatorCharm(CharmBase):
 
     @property
     def _nrf_is_listening(self) -> bool:
-        # TODO: Check if the NRF is listening on the configured port
+        # TODO: Replace timer with check if the NRF is listening on the configured port
         # NRF_IP_SBI_INTERFACE=$(ifconfig $NRF_INTERFACE_NAME_FOR_SBI | grep inet | awk {'print $2'})  # noqa: E501, W505
         # NRF_SBI_PORT_STATUS=$(netstat -tnpl | grep -o "$NRF_IP_SBI_INTERFACE:$NRF_INTERFACE_PORT_FOR_SBI") # noqa: E501, W505
         # if [[ -z $NRF_SBI_PORT_STATUS ]]; then
         # 	STATUS=1
         # 	echo "Healthcheck error: UNHEALTHY SBI TCP/HTTP port $NRF_INTERFACE_PORT_FOR_SBI is not listening." # noqa: E501, W505
         # fi
+        time.sleep(5)
         return True
 
     def _push_config(self) -> None:

@@ -95,7 +95,7 @@ class TestCharm(unittest.TestCase):
 
     @patch("ops.model.Container.get_service")
     def test_given_nrf_service_started_when_nrf_relation_joined_then_nrf_relation_data_is_set(
-            self, patch_get_service
+        self, patch_get_service
     ):
         self.harness.set_leader(True)
         self.harness.set_can_connect(container="nrf", val=True)

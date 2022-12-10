@@ -63,6 +63,7 @@ class Oai5GNrfOperatorCharm(CharmBase):
         """
         self._container.add_layer("nrf", self._pebble_layer, combine=True)
         self._container.replan()
+        self._container.restart(self._service_name)
 
     def _on_config_changed(self, event: ConfigChangedEvent) -> None:
         """Triggered on any change in configuration.
@@ -90,9 +91,11 @@ class Oai5GNrfOperatorCharm(CharmBase):
         if not self.unit.is_leader():
             return
         if not self._nrf_service_started:
+            logger.info("NRF service not started yet, deferring event")
             event.defer()
             return
         if not self._nrf_is_listening:
+            logger.info("NRF is not listening yet, deferring event")
             event.defer()
             return
         self.nrf_provides.set_nrf_information(

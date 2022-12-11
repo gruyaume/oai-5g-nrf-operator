@@ -16,7 +16,7 @@ from charms.observability_libs.v1.kubernetes_service_patch import (  # type: ign
 from jinja2 import Environment, FileSystemLoader
 from ops.charm import CharmBase, ConfigChangedEvent
 from ops.main import main
-from ops.model import ActiveStatus, WaitingStatus
+from ops.model import ActiveStatus, ModelError, WaitingStatus
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +110,11 @@ class Oai5GNrfOperatorCharm(CharmBase):
     def _nrf_service_started(self) -> bool:
         if not self._container.can_connect():
             return False
-        if not self._container.get_service(self._service_name).is_running():
+        try:
+            service = self._container.get_service(self._service_name)
+        except ModelError:
+            return False
+        if not service.is_running():
             return False
         return True
 

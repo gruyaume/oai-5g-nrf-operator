@@ -50,7 +50,7 @@ class Oai5GNrfOperatorCharm(CharmBase):
             ],
         )
         self.nrf_provides = FiveGNRFProvides(self, "fiveg-nrf")
-        self.framework.observe(self.on.config_changed, self._on_config_changed)
+        self.framework.observe(self.on.nrf_pebble_ready, self._on_config_changed)
         self.framework.observe(
             self.on.fiveg_nrf_relation_joined, self._on_fiveg_nrf_relation_joined
         )
@@ -164,7 +164,7 @@ class Oai5GNrfOperatorCharm(CharmBase):
 
     @property
     def _config_sbi_interface_name(self) -> str:
-        return self.model.config["nrfInterfaceNameForSBI"]
+        return "eth0"
 
     @property
     def _config_sbi_interface_port(self) -> str:

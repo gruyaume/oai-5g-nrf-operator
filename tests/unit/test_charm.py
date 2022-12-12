@@ -39,7 +39,8 @@ class TestCharm(unittest.TestCase):
                 }
             },
         }
-        self.harness.update_config({"nrfInterfaceNameForSBI": "eth0"})
+
+        self.harness.container_pebble_ready(container_name="nrf")
 
         updated_plan = self.harness.get_container_pebble_plan("nrf").to_dict()
         service = self.harness.model.unit.get_container("nrf").get_service("nrf")
@@ -53,7 +54,7 @@ class TestCharm(unittest.TestCase):
     ):
         self.harness.set_can_connect(container="nrf", val=True)
 
-        self.harness.update_config({"nrfInterfaceNameForSBI": "eth0"})
+        self.harness.container_pebble_ready(container_name="nrf")
 
         mock_push.assert_called_with(
             path="/openair-nrf/etc/nrf.conf",

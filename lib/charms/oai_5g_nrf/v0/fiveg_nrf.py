@@ -214,6 +214,14 @@ class FiveGNRFProvides(Object):
         relation = self.model.get_relation(self.relationship_name, relation_id=relation_id)
         if not relation:
             raise RuntimeError(f"Relation {self.relationship_name} not created yet.")
+        if self.nrf_data_is_set(
+            relation_id=relation_id,
+            nrf_ipv4_address=nrf_ipv4_address,
+            nrf_fqdn=nrf_fqdn,
+            nrf_port=nrf_port,
+            nrf_api_version=nrf_api_version,
+        ):
+            return
         relation.data[self.charm.app].update(
             {
                 "nrf_ipv4_address": nrf_ipv4_address,
@@ -222,3 +230,43 @@ class FiveGNRFProvides(Object):
                 "nrf_api_version": nrf_api_version,
             }
         )
+
+    def nrf_data_is_set(
+        self,
+        relation_id: int,
+        nrf_ipv4_address: str,
+        nrf_fqdn: str,
+        nrf_api_version: str,
+        nrf_port: str,
+    ) -> bool:
+        """Returns whether nrf_address is set in relation data."""
+        relation = self.model.get_relation(self.relationship_name, relation_id=relation_id)
+        if not relation:
+            raise RuntimeError(f"Relation {self.relationship_name} not created yet.")
+        if relation.data[self.charm.app].get("nrf_ipv4_address", None) != nrf_ipv4_address:
+            logger.info(f"nrf_ipv4_address not set to {nrf_ipv4_address} in relation data")
+            return False
+        if relation.data[self.charm.app].get("nrf_fqdn", None) != nrf_fqdn:
+            logger.info(f"nrf_fqdn not set to {nrf_fqdn} in relation data")
+            return False
+        if relation.data[self.charm.app].get("nrf_port", None) != nrf_port:
+            logger.info(f"nrf_port not set to {nrf_port} in relation data")
+            return False
+        if relation.data[self.charm.app].get("nrf_api_version", None) != nrf_api_version:
+            logger.info(f"nrf_api_version not set to {nrf_api_version} in relation data")
+            return False
+        return True
+
+    def set_nrf_information_for_all_relations(
+        self, nrf_ipv4_address: str, nrf_fqdn: str, nrf_port: str, nrf_api_version: str
+    ) -> None:
+        """Sets UDR information in relation data for all relations."""
+        relations = self.model.relations
+        for relation in relations[self.relationship_name]:
+            self.set_nrf_information(
+                nrf_ipv4_address=nrf_ipv4_address,
+                nrf_fqdn=nrf_fqdn,
+                nrf_port=nrf_port,
+                nrf_api_version=nrf_api_version,
+                relation_id=relation.id,
+            )

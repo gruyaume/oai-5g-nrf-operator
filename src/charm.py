@@ -80,7 +80,17 @@ class Oai5GNrfOperatorCharm(CharmBase):
             return
         self._push_config()
         self._update_pebble_layer()
+        if self.unit.is_leader():
+            self._set_nrf_information_for_all_relations()
         self.unit.status = ActiveStatus()
+
+    def _set_nrf_information_for_all_relations(self):
+        self.nrf_provides.set_nrf_information_for_all_relations(
+            nrf_ipv4_address="127.0.0.1",
+            nrf_fqdn=f"{self.model.app.name}.{self.model.name}.svc.cluster.local",
+            nrf_port=self._config_sbi_interface_port,
+            nrf_api_version=self._config_sbi_interface_nrf_api_version,
+        )
 
     def _on_fiveg_nrf_relation_joined(self, event) -> None:
         """Triggered when a relation is joined.
